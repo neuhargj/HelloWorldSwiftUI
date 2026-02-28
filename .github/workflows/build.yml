@@ -2,9 +2,9 @@ name: iOS Build
 
 on:
   push:
-    branches: [ "main" ] # Updated to main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ] # Updated to main
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -14,15 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug - List Files
-        run: ls -R
+      # This step helps us see exactly where we are
+      - name: List files for debugging
+        run: find . -maxdepth 2 -name "*.xcodeproj"
 
       - name: Build for Simulator
-        # Ensure this matches the folder name in your repo
-        working-directory: HelloWorldSwiftUI 
         run: |
+          # We search for the xcodeproj and build it regardless of folder depth
+          PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
+          PROJECT_DIR=$(dirname "$PROJECT_PATH")
+          
+          echo "Building project at $PROJECT_PATH"
+          
           xcodebuild build \
-            -project "HelloWorldSwiftUI.xcodeproj" \
+            -project "$PROJECT_PATH" \
             -scheme "HelloWorldSwiftUI" \
             -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
             CODE_SIGNING_ALLOWED=NO \
