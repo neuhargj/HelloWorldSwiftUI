@@ -1,0 +1,24 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [ "master" ] # This repo uses 'master' as the default branch
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build for Simulator
+        run: |
+          xcodebuild build \
+            -project "HelloWorldSwiftUI.xcodeproj" \
+            -scheme "HelloWorldSwiftUI" \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
