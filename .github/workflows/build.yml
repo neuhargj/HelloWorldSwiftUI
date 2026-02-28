@@ -2,9 +2,9 @@ name: iOS Build
 
 on:
   push:
-    branches: [ "master" ] # This repo uses 'master' as the default branch
+    branches: [ "main" ] # This repo uses 'master' as the default branch
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
   build:
