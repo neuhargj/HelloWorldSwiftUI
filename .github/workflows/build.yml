@@ -2,9 +2,9 @@ name: iOS Build
 
 on:
   push:
-    branches: [ "main" ] # This repo uses 'master' as the default branch
+    branches: [ "main" ] # Updated to main
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main" ] # Updated to main
 
 jobs:
   build:
@@ -14,7 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Debug - List Files
+        run: ls -R
+
       - name: Build for Simulator
+        # Ensure this matches the folder name in your repo
+        working-directory: HelloWorldSwiftUI 
         run: |
           xcodebuild build \
             -project "HelloWorldSwiftUI.xcodeproj" \
