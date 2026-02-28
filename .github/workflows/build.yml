@@ -2,9 +2,9 @@ name: iOS Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
 
 jobs:
   build:
@@ -14,21 +14,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # This step helps us see exactly where we are
-      - name: List files for debugging
-        run: find . -maxdepth 2 -name "*.xcodeproj"
+      - name: Detect Project and Scheme
+        id: info
+        run: |
+          # 1. Find the project file
+          PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
+          echo "PROJECT_PATH=$PROJECT_PATH" >> $GITHUB_ENV
+          
+          # 2. Extract the first scheme name from the project
+          SCHEME_NAME=$(xcodebuild -list -project "$PROJECT_PATH" | awk '/Schemes:/ {found=1; next} found {print $1; exit}')
+          echo "SCHEME_NAME=$SCHEME_NAME" >> $GITHUB_ENV
+          
+          echo "Found Project: $PROJECT_PATH"
+          echo "Found Scheme: $SCHEME_NAME"
 
       - name: Build for Simulator
         run: |
-          # We search for the xcodeproj and build it regardless of folder depth
-          PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
-          PROJECT_DIR=$(dirname "$PROJECT_PATH")
-          
-          echo "Building project at $PROJECT_PATH"
-          
           xcodebuild build \
-            -project "$PROJECT_PATH" \
-            -scheme "HelloWorldSwiftUI" \
+            -project "${{ env.PROJECT_PATH }}" \
+            -scheme "${{ env.SCHEME_NAME }}" \
             -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
             CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
